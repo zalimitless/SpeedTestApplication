@@ -1,0 +1,1 @@
+nexe SpeedTest.js --build --verbose
