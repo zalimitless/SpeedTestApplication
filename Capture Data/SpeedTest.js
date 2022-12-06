@@ -1,7 +1,7 @@
-const { Console } = require("console");
+const { assert } = require("console");
 const FastSpeedtest = require("fast-speedtest-api");
 const FileSystem = require('fs');
- 
+
 // Visit fast.com and check the network for the token. It should be in the URL.
 // Or go into the code and search for the keyword "Token" until you find it!
 let speedtest = new FastSpeedtest({
@@ -29,7 +29,7 @@ function stampFileName(topic)
     const month = d.getMonth();
     const year = d.getFullYear();
 
-    return topic + '_' + day + month + year + '.json';
+    return topic + '_' + day + month + year + '.csv';
 }
 
 function writeFile(fileName, speed)
@@ -37,10 +37,9 @@ function writeFile(fileName, speed)
     const dateStamp = Date.now();
     if(!FileSystem.existsSync(fileName))
     {
-        FileSystem.writeFileSync(fileName, '{}');
+        FileSystem.writeFileSync(fileName,"Time;Speed\n");
         console.log('Created File: ' + fileName);
     }
-    let data = JSON.parse(FileSystem.readFileSync(fileName, {encoding:'utf8', flag:'r'}));
-    data[Math.round(parseInt(dateStamp) / 1000)] = speed;
-    FileSystem.writeFileSync(fileName, JSON.stringify(data));
+    var output = (Math.round(parseInt(dateStamp) / 1000).toString() + ';' + (speed).toString());
+    FileSystem.appendFileSync(fileName, output + "\n")
 }
