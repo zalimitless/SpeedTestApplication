@@ -1,6 +1,7 @@
 {
   "dependencies": {
     "fast-speedtest-api": "^0.3.2",
+    "net-ping": "^1.2.3",
     "ping-monitor": "^0.6.2"
   }
 }

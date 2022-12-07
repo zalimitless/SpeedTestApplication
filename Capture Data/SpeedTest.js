@@ -1,6 +1,6 @@
-const { assert } = require("console");
 const FastSpeedtest = require("fast-speedtest-api");
-const FileSystem = require('fs');
+const { stampFileName, writeFile } = require("./Utils/FileFunctions");
+const { pingRounds, ping } = require("./Utils/PingFunctions");
 
 // Visit fast.com and check the network for the token. It should be in the URL.
 // Or go into the code and search for the keyword "Token" until you find it!
@@ -13,33 +13,31 @@ let speedtest = new FastSpeedtest({
     bufferSize: 8, // default: 8
     unit: FastSpeedtest.UNITS.Mbps // default: Bps
 });
- 
-speedtest.getSpeed().then(s => {
-    writeFile(stampFileName('Speedtest'), s);
-    console.log(`Speed: ${s} Mbps`);
-}).catch(e => {
-	writeFile(stampFileName('Speedtest'), 0);
-    console.error(e.message);
-});
 
-function stampFileName(topic)
+var done = false;
+
+const d = new Date();
+
+async function doSpeedTest()
 {
-    const d = new Date();
-    const day = d.getDate();
-    const month = d.getMonth();
-    const year = d.getFullYear();
 
-    return topic + '_' + day + month + year + '.csv';
+    speedtest.getSpeed().then(s => {
+        writeFile(stampFileName('Speedtest', d), s);
+        console.log(`Speed: ${s} Mbps`);
+        done = true;
+    }).catch(e => {
+        writeFile(stampFileName('Speedtest', d), 0);
+        console.error(e.message);
+        done = true;
+    });
 }
 
-function writeFile(fileName, speed)
+async function pingLoop()
 {
-    const dateStamp = Date.now();
-    if(!FileSystem.existsSync(fileName))
+    while(!done)
     {
-        FileSystem.writeFileSync(fileName,"Time;Speed\n");
-        console.log('Created File: ' + fileName);
+        await ping('8.8.8.8', d, 500);
     }
-    var output = (Math.round(parseInt(dateStamp) / 1000).toString() + ';' + (speed).toString());
-    FileSystem.appendFileSync(fileName, output + "\n")
 }
+// pingRounds(10, '8.8.8.8', d, 50)
+Promise.all([doSpeedTest(), pingLoop()])
