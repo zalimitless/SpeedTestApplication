@@ -1,1 +1,1 @@
-nexe SpeedTest.js --build --verbose
+nexe SpeedTest.js --build --target linux-x64 --verbose

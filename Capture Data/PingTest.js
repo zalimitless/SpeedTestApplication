@@ -26,7 +26,7 @@ function pingTargets(target, callback, date)
             else
             {
                 callback (-1, error.toString(), date);
-            }
+            } 
         else
         {
             callback (1 , ms, date);
